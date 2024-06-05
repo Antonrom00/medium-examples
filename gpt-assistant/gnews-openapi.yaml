@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: GNews API
   description: REST API to search for current and historic news articles published by over 60,000 sources.
-  version: 1.0.0
+  version: 4.0.0
 servers:
   - url: https://gnews.io/api/v4
     description: GNews API Server
