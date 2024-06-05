@@ -1,15 +1,15 @@
 openapi: 3.0.0
 info:
   title: GNews API
-  description: An API for searching and retrieving news articles from over 60,000 sources.
+  description: REST API to search for current and historic news articles published by over 60,000 sources.
   version: 4.0.0
 servers:
   - url: https://gnews.io/api/v4
-    description: Main (production) server
+    description: GNews API Server
 paths:
   /search:
     get:
-      operationId: searchArticles
+      operationId: searchNews
       summary: Search for news articles
       parameters:
         - name: apikey
@@ -21,80 +21,73 @@ paths:
             default: {your_apikey}
         - name: q
           in: query
-          description: Keywords to search for
           required: true
           schema:
             type: string
+          description: Search keywords
         - name: lang
           in: query
-          description: Language of the articles
-          required: false
           schema:
             type: string
             enum: [ar, zh, nl, en, fr, de, el, he, hi, it, ja, ml, mr, no, pt, ro, ru, es, sv, ta, te, uk]
+          description: Language code of the articles
         - name: country
           in: query
-          description: Country of the articles
-          required: false
           schema:
             type: string
             enum: [au, br, ca, cn, eg, fr, de, gr, hk, in, ie, il, it, jp, nl, no, pk, pe, ph, pt, ro, ru, sg, es, se, ch, tw, ua, gb, us]
+          description: Country code where the articles were published
         - name: max
           in: query
-          description: Maximum number of articles to return (1-100)
-          required: false
           schema:
             type: integer
             minimum: 1
             maximum: 100
-          default: 10
+            default: 10
+          description: Maximum number of articles to return
         - name: in
           in: query
+          schema:
+            type: string
+            default: title,description
           description: Attributes to search in (title, description, content)
-          required: false
-          schema:
-            type: string
-        - name: nullable
-          in: query
-          description: Attributes that can return null values
-          required: false
-          schema:
-            type: string
         - name: from
           in: query
-          description: Filter articles published after this date (YYYY-MM-DDThh:mm:ssZ)
-          required: false
           schema:
             type: string
-          format: date-time
+            format: date-time
+          description: Start date for the search
         - name: to
           in: query
-          description: Filter articles published before this date (YYYY-MM-DDThh:mm:ssZ)
-          required: false
           schema:
             type: string
-          format: date-time
+            format: date-time
+          description: End date for the search
         - name: sortby
           in: query
-          description: Sort articles by publication date or relevance
-          required: false
           schema:
             type: string
             enum: [publishedAt, relevance]
-          default: publishedAt
+            default: publishedAt
+          description: Sort by publication date or relevance
         - name: page
           in: query
-          description: Pagination of results (requires a paid subscription)
-          required: false
           schema:
             type: integer
+            default: 1
+          description: Page number for pagination
         - name: expand
           in: query
-          description: Expand to return full content of articles (requires a paid subscription)
-          required: false
           schema:
             type: string
-            enum: [content]
+            default: content
+          description: Expand to full content
+        - name: apikey
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Your API key
       responses:
         '200':
           description: A JSON array of news articles
@@ -133,7 +126,7 @@ paths:
   /top-headlines:
     get:
       operationId: getTopHeadlines
-      summary: Get top headlines
+      summary: Get top headline news articles
       parameters:
         - name: apikey
           in: query
@@ -144,77 +137,73 @@ paths:
             default: {your_apikey}
         - name: category
           in: query
-          description: Category of the articles
-          required: false
           schema:
             type: string
             enum: [general, world, nation, business, technology, entertainment, sports, science, health]
-          default: general
+            default: general
+          description: News category
         - name: lang
           in: query
-          description: Language of the articles
-          required: false
           schema:
             type: string
             enum: [ar, zh, nl, en, fr, de, el, he, hi, it, ja, ml, mr, no, pt, ro, ru, es, sv, ta, te, uk]
+          description: Language code of the articles
         - name: country
           in: query
-          description: Country of the articles
-          required: false
           schema:
             type: string
             enum: [au, br, ca, cn, eg, fr, de, gr, hk, in, ie, il, it, jp, nl, no, pk, pe, ph, pt, ro, ru, sg, es, se, ch, tw, ua, gb, us]
+          description: Country code where the articles were published
         - name: max
           in: query
-          description: Maximum number of articles to return (1-100)
-          required: false
           schema:
             type: integer
             minimum: 1
             maximum: 100
-          default: 10
+            default: 10
+          description: Maximum number of articles to return
         - name: nullable
           in: query
-          description: Attributes that can return null values
-          required: false
           schema:
             type: string
+          description: Attributes allowed to return null values
         - name: from
           in: query
-          description: Filter articles published after this date (YYYY-MM-DDThh:mm:ssZ)
-          required: false
           schema:
             type: string
-          format: date-time
+            format: date-time
+          description: Start date for the search
         - name: to
           in: query
-          description: Filter articles published before this date (YYYY-MM-DDThh:mm:ssZ)
-          required: false
           schema:
             type: string
-          format: date-time
+            format: date-time
+          description: End date for the search
         - name: q
           in: query
-          description: Keywords to narrow down the results
-          required: false
           schema:
             type: string
+          description: Search keywords
         - name: page
           in: query
-          description: Pagination of results (requires a paid subscription)
-          required: false
           schema:
             type: integer
+            default: 1
+          description: Page number for pagination
         - name: expand
           in: query
-          description: Expand to return full content of articles (requires a paid subscription)
-          required: false
           schema:
             type: string
-            enum: [content]
+          description: Expand to full content
+        - name: apikey
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Your API key
       responses:
         '200':
-          description: A JSON array of top headlines
+          description: A JSON array of top headline news articles
           content:
             application/json:
               schema:
@@ -247,3 +236,28 @@ paths:
                               type: string
                             url:
                               type: string
+components:
+  schemas:
+    Article:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        content:
+          type: string
+        url:
+          type: string
+        image:
+          type: string
+        publishedAt:
+          type: string
+          format: date-time
+        source:
+          type: object
+          properties:
+            name:
+              type: string
+            url:
+              type: string
